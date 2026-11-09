@@ -1,0 +1,19 @@
+import type { Metadata } from 'next';
+import './globals.css';
+import { LiveRefresh } from './live.tsx';
+
+export const metadata: Metadata = {
+  title: '마하나임 컵',
+  description: '마하나임 컵 풋살 대회 실시간 결과',
+};
+
+export default function RootLayout({ children }: LayoutProps<'/'>) {
+  return (
+    <html lang="ko">
+      <body className="min-h-dvh bg-slate-100 text-slate-900 antialiased">
+        <main className="mx-auto max-w-xl px-4 pb-16">{children}</main>
+        <LiveRefresh />
+      </body>
+    </html>
+  );
+}
