@@ -11,7 +11,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html lang="ko">
       <body className="min-h-dvh bg-slate-100 text-slate-900 antialiased">
-        <main className="mx-auto max-w-xl px-4 pb-16">{children}</main>
+        <main className="mx-auto max-w-xl px-4 pb-28">{children}</main>
         <LiveRefresh />
       </body>
     </html>

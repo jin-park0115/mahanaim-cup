@@ -1,24 +1,19 @@
 import Link from 'next/link';
+import { GlassNav } from './glass-nav.tsx';
 import { courtName, type Division, type MatchView } from '@/lib/data.ts';
 import { TEAM_COLOR, type Standings } from '@/lib/standings.ts';
 
 export function Header({ division, path }: { division: Division; path: '/' | '/scorers' }) {
   // 부문 1개라 탭 없음
   return (
-    <header className="sticky top-0 z-10 -mx-4 bg-slate-100/95 px-4 pt-4 pb-3 backdrop-blur">
-      <div className="mb-3 flex items-baseline justify-between">
-        <Link href={`/?d=${division}`} className="text-xl font-bold">
-          ⚽ 마하나임 <span className="text-pink-500">풋살대회</span>
-        </Link>
-        <nav className="flex gap-3 text-sm text-slate-600">
-          <Link href={`/?d=${division}`} className={path === '/' ? 'font-bold text-slate-900' : ''}>
-            경기·순위
-          </Link>
-          <Link href={`/scorers?d=${division}`} className={path === '/scorers' ? 'font-bold text-slate-900' : ''}>
-            득점왕
-          </Link>
-        </nav>
-      </div>
+    <header className="hero-glow -mx-4 mb-2 rounded-b-3xl px-5 pt-6 pb-5 text-white shadow-lg">
+      <Link href={`/?d=${division}`} className="block">
+        <p className="text-xs font-semibold tracking-[0.2em] text-pink-300">MAHANAIM FUTSAL CUP</p>
+        <h1 className="mt-1 text-2xl font-black">
+          ⚽ 마하나임 <span className="text-pink-400">풋살대회</span>
+        </h1>
+      </Link>
+      <GlassNav path={path} division={division} />
     </header>
   );
 }
@@ -57,11 +52,20 @@ export function MatchCard({ v, playerName, title }: { v: MatchView; playerName: 
   const pk = m.home_pk !== null && m.away_pk !== null;
 
   return (
-    <Link href={`/match/${m.id}`} className="block rounded-xl bg-white p-3 shadow-sm active:bg-slate-50">
+    <Link
+      href={`/match/${m.id}`}
+      className={`block rounded-2xl bg-white p-3 shadow-sm active:bg-slate-50 ${m.status === 'live' ? 'ring-2 ring-pink-500' : ''}`}
+    >
       <div className="mb-2 flex items-center justify-between text-xs text-slate-500">
-        <span>
-          {title && <b className="mr-1 text-slate-700">{title}</b>}
-          {m.start_time.slice(0, 5)} · {courtName(m.court)}
+        <span className="flex items-center gap-1.5">
+          {title && <b className="text-sm text-pink-600">{title}</b>}
+          <span className="tabular-nums">{m.start_time.slice(0, 5)}</span>
+          {/* 포스터처럼 블랙 구장은 검은 칩, 화이트 구장은 테두리 칩 */}
+          <span
+            className={`rounded-full px-2 py-0.5 font-semibold ${m.court === 1 ? 'bg-slate-900 text-white' : 'border border-slate-900 text-slate-900'}`}
+          >
+            {courtName(m.court)}
+          </span>
         </span>
         {m.status === 'live' && <span className="animate-pulse rounded bg-red-600 px-1.5 py-0.5 font-bold text-white">LIVE</span>}
         {m.status === 'finished' && <span>종료</span>}
