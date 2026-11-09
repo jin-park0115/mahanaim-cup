@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   computeStandings,
   decide,
+  eventTime,
   resolveSource,
   sourceLabel,
   suspendedPlayers,
@@ -140,4 +141,13 @@ test('4강 승자·패자 진출, 동점은 승부차기', () => {
   assert.equal(resolveSource('W:SF2', 7, {}, decided), 7); // 수동 지정 우선
   assert.equal(sourceLabel('W:SF1'), '4강1 승자');
   assert.equal(sourceLabel('L:SF2'), '4강2 패자');
+});
+
+test('eventTime: 초 단위, 직접 고친 분은 분만', () => {
+  const start = '2026-11-20T01:10:00Z';
+  assert.equal(eventTime({ minute: 1, created_at: '2026-11-20T01:10:49Z' }, start), '49초');
+  assert.equal(eventTime({ minute: 4, created_at: '2026-11-20T01:13:12Z' }, start), '3분 12초');
+  assert.equal(eventTime({ minute: 7, created_at: '2026-11-20T01:13:12Z' }, start), '7분');
+  assert.equal(eventTime({ minute: null, created_at: '2026-11-20T01:13:12Z' }, start), '');
+  assert.equal(eventTime({ minute: 5, created_at: '2026-11-20T01:13:12Z' }, null), '5분');
 });

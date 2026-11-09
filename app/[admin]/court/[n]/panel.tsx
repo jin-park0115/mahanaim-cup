@@ -4,7 +4,7 @@ import { addCard, addGoal, addPlayer, deleteEvent, finishMatch, setEventMinute, 
 
 type Player = { id: number; name: string; suspended: boolean };
 type Side = { team: number | null; label: string; players: Player[] };
-export type Event = { kind: 'goal' | 'card'; id: number; minute: number | null; at: string; home: boolean; text: string };
+export type Event = { kind: 'goal' | 'card'; id: number; minute: number | null; time: string; at: string; home: boolean; text: string };
 type Props = {
   adminKey: string;
   title: string;
@@ -133,20 +133,20 @@ export function CourtPanel({ adminKey: key, title, match, home, away, score, eve
             {events.length === 0 && <li className="p-3 text-center text-sm text-slate-500">기록 없음</li>}
             {events.map((e) => (
               <li key={`${e.kind}${e.id}`} className="flex items-center gap-2 px-3 py-2">
-                <input
-                  type="number"
-                  inputMode="numeric"
-                  min={0}
-                  max={99}
-                  defaultValue={e.minute ?? ''}
-                  aria-label="분"
-                  className="w-12 rounded border border-slate-300 px-1 py-1 text-center"
-                  onBlur={(ev) => {
-                    const v = ev.target.value === '' ? null : Number(ev.target.value);
+                {/* 시간은 자동 기록. 늦게 눌렀을 때만 탭해서 분 단위로 고친다 */}
+                <button
+                  className="w-20 shrink-0 rounded bg-slate-100 px-1 py-1 text-center text-sm tabular-nums"
+                  title="탭해서 시간(분) 수정"
+                  onClick={() => {
+                    const input = prompt('몇 분째로 고칠까요? (비우면 시간 없음)', e.minute?.toString() ?? '');
+                    if (input === null) return;
+                    const v = input.trim() === '' ? null : Number(input);
+                    if (v !== null && !(Number.isInteger(v) && v >= 0 && v <= 99)) return alert('0~99 사이 숫자로 입력해 주세요.');
                     if (v !== e.minute) act(() => setEventMinute(key, e.kind, e.id, v));
                   }}
-                />
-                <span className="text-xs text-slate-400">&apos;</span>
+                >
+                  {e.time || '시간 없음'}
+                </button>
                 <span className="min-w-0 flex-1 truncate">
                   <span className="mr-1 text-xs text-slate-400">{e.home ? home.label : away.label}</span>
                   {e.text}

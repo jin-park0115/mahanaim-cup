@@ -200,3 +200,14 @@ export function topScorers(goals: Goal[]) {
   const list = [...counts].map(([player_id, gs]) => ({ player_id, goals: gs.length })).sort((a, b) => b.goals - a.goals);
   return list.map((x) => ({ ...x, rank: list.findIndex((y) => y.goals === x.goals) + 1 }));
 }
+
+/**
+ * 기록 시각 표시: 경기 시작 후 '49초', '3분 12초'.
+ * 운영진이 분을 직접 고친 기록(저장된 분 ≠ 기록 시각으로 계산한 분)은 '7분'으로만 표시
+ */
+export function eventTime(e: { minute: number | null; created_at: string }, startedAt: string | null) {
+  if (e.minute === null) return '';
+  const s = startedAt ? Math.floor((Date.parse(e.created_at) - Date.parse(startedAt)) / 1000) : -1;
+  if (s < 0 || Math.max(1, Math.floor(s / 60) + 1) !== e.minute) return `${e.minute}분`;
+  return s < 60 ? `${s}초` : `${Math.floor(s / 60)}분 ${s % 60}초`;
+}

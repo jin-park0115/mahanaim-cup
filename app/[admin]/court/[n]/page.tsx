@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { COURTS, courtName, loadDivision, DIVISION_LABEL, stageLabel } from '@/lib/data.ts';
-import { suspendedPlayers } from '@/lib/standings.ts';
+import { eventTime, suspendedPlayers } from '@/lib/standings.ts';
 import { CourtPanel, type Event } from './panel.tsx';
 
 const STATUS = { scheduled: '예정', live: '진행중', finished: '종료' } as const;
@@ -61,6 +61,7 @@ export default async function CourtPage({ params, searchParams }: PageProps<'/[a
       kind: 'goal' as const,
       id: g.id,
       minute: g.minute,
+      time: eventTime(g, v.match.started_at),
       at: g.created_at,
       home: g.scoring_team_id === v.home,
       text: `⚽ ${d.playerName.get(g.player_id)}${g.own_goal ? ' (자책골)' : ''}`,
@@ -69,6 +70,7 @@ export default async function CourtPage({ params, searchParams }: PageProps<'/[a
       kind: 'card' as const,
       id: c.id,
       minute: c.minute,
+      time: eventTime(c, v.match.started_at),
       at: c.created_at,
       home: c.team_id === v.home,
       text: `${CARD[c.type]} ${d.playerName.get(c.player_id)}`,
