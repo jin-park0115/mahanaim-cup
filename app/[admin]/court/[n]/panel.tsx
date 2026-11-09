@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState, useTransition } from 'react';
+import { TEAM_COLOR } from '@/lib/standings.ts';
 import { addCard, addGoal, addPlayer, deleteEvent, finishMatch, setEventMinute, startMatch } from '../../actions.ts';
 
 type Player = { id: number; name: string; suspended: boolean };
@@ -47,13 +48,22 @@ export function CourtPanel({ adminKey: key, title, match, home, away, score, eve
     <div className={pending ? 'pointer-events-none opacity-60' : ''}>
       <p className="text-sm text-slate-500">{title}</p>
       {match.status === 'live' && match.started_at && <Timer since={match.started_at} />}
-      <div className="my-3 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 rounded-xl bg-white p-4 shadow-sm">
-        <span className="truncate text-right text-lg font-bold">{home.label}</span>
-        <span className="text-4xl font-black tabular-nums">
-          {score[0]}:{score[1]}
-        </span>
-        <span className="truncate text-lg font-bold">{away.label}</span>
-        {match.home_pk !== null && <span className="col-span-3 text-center text-sm text-slate-500">승부차기 {match.home_pk}:{match.away_pk}</span>}
+      {/* 팀 색으로 반반 채움: [홈팀 이름 · 점수] [점수 · 원정팀 이름] */}
+      <div className="my-3 grid grid-cols-2 overflow-hidden rounded-xl shadow-sm">
+        {(['home', 'away'] as const).map((s, i) => (
+          <div
+            key={s}
+            className={`flex items-center gap-3 px-4 py-5 ${i === 0 ? 'justify-end' : 'flex-row-reverse justify-end'} ${TEAM_COLOR[sides[s].label] ?? 'bg-white'}`}
+          >
+            <span className="truncate text-lg font-bold">{sides[s].label}</span>
+            <span className="text-4xl font-black tabular-nums">{score[i]}</span>
+          </div>
+        ))}
+        {match.home_pk !== null && (
+          <span className="col-span-2 bg-white py-1 text-center text-sm text-slate-500">
+            승부차기 {match.home_pk}:{match.away_pk}
+          </span>
+        )}
       </div>
 
       {match.status === 'scheduled' &&
@@ -92,7 +102,7 @@ export function CourtPanel({ adminKey: key, title, match, home, away, score, eve
               {!step.side && (
                 <div className="grid grid-cols-2 gap-2">
                   {(['home', 'away'] as const).map((s) => (
-                    <button key={s} className={`${big} truncate bg-slate-100 px-2`} onClick={() => setStep({ ...step, side: s })}>
+                    <button key={s} className={`${big} truncate px-2 ${TEAM_COLOR[sides[s].label] ?? 'bg-slate-100'}`} onClick={() => setStep({ ...step, side: s })}>
                       {sides[s].label}
                     </button>
                   ))}

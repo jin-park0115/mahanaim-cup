@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { courtName, type Division, type MatchView } from '@/lib/data.ts';
-import type { Standings } from '@/lib/standings.ts';
+import { TEAM_COLOR, type Standings } from '@/lib/standings.ts';
 
 export function Header({ division, path }: { division: Division; path: '/' | '/scorers' }) {
   // 부문 1개라 탭 없음
@@ -23,13 +23,6 @@ export function Header({ division, path }: { division: Division; path: '/' | '/s
   );
 }
 
-// 포스터 팀 색. 이름이 다르면(토너먼트 미정 '1위' 등) 색 없이 글자만
-const TEAM_COLOR: Record<string, string> = {
-  블랙: 'bg-neutral-900 text-white',
-  핑크: 'bg-pink-400 text-white',
-  그린: 'bg-green-700 text-white',
-  레드: 'bg-red-600 text-white',
-};
 
 export function Team({ name }: { name: string }) {
   const c = TEAM_COLOR[name];

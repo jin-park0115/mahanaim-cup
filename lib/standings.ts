@@ -211,3 +211,11 @@ export function eventTime(e: { minute: number | null; created_at: string }, star
   if (s < 0 || Math.max(1, Math.floor(s / 60) + 1) !== e.minute) return `${e.minute}분`;
   return s < 60 ? `${s}초` : `${Math.floor(s / 60)}분 ${s % 60}초`;
 }
+
+/** 포스터 팀 색(배경+글자). 이름이 다르면('1위' 등 미정) 없음 */
+export const TEAM_COLOR: Record<string, string> = {
+  블랙: 'bg-neutral-900 text-white',
+  핑크: 'bg-pink-400 text-white',
+  그린: 'bg-green-700 text-white',
+  레드: 'bg-red-600 text-white',
+};
