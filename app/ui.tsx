@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { courtName, type Division, type MatchView } from '@/lib/data.ts';
-import { eventTime, type Standings } from '@/lib/standings.ts';
+import type { Standings } from '@/lib/standings.ts';
 
 export function Header({ division, path }: { division: Division; path: '/' | '/scorers' }) {
   // 부문 1개라 탭 없음
@@ -37,7 +37,8 @@ export function Team({ name }: { name: string }) {
 }
 
 const CARD_ICON ={ yellow: '🟨', second_yellow: '🟨🟥', red: '🟥' } as const;
-const at = (e: { minute: number | null; created_at: string }, startedAt: string | null) => (e.minute === null ? '' : ` ${eventTime(e, startedAt)}`);
+// 공개 화면은 분만(축구 중계식: 0~59초 = 1'). 초 단위는 운영진 화면에서만
+const min = (m: number | null) => (m === null ? '' : ` ${m}'`);
 
 export function MatchCard({ v, playerName, title }: { v: MatchView; playerName: Map<number, string>; title?: string }) {
   const { match: m, score } = v;
@@ -48,7 +49,7 @@ export function MatchCard({ v, playerName, title }: { v: MatchView; playerName: 
         <li key={`g${g.id}`}>
           ⚽ {playerName.get(g.player_id)}
           {g.own_goal && ' (자책)'}
-          {at(g, m.started_at)}
+          {min(g.minute)}
         </li>
       )),
     ...v.cards
@@ -56,7 +57,7 @@ export function MatchCard({ v, playerName, title }: { v: MatchView; playerName: 
       .map((c) => (
         <li key={`c${c.id}`}>
           {CARD_ICON[c.type]} {playerName.get(c.player_id)}
-          {at(c, m.started_at)}
+          {min(c.minute)}
         </li>
       )),
   ];

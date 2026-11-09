@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { loadDivision, matchDivision } from '@/lib/data.ts';
-import { eventTime } from '@/lib/standings.ts';
 import { MatchCard } from '../../ui.tsx';
 
 const CARD_LABEL = { yellow: '🟨 경고', second_yellow: '🟨🟥 경고누적 퇴장', red: '🟥 퇴장' } as const;
@@ -17,7 +16,6 @@ export default async function MatchPage({ params }: PageProps<'/match/[id]'>) {
     ...v.goals.map((g) => ({
       key: `g${g.id}`,
       minute: g.minute,
-      time: eventTime(g, v.match.started_at),
       at: g.created_at,
       home: g.scoring_team_id === v.home,
       text: `⚽ ${d.playerName.get(g.player_id)}${g.own_goal ? ' (자책골)' : ''}`,
@@ -25,7 +23,6 @@ export default async function MatchPage({ params }: PageProps<'/match/[id]'>) {
     ...v.cards.map((c) => ({
       key: `c${c.id}`,
       minute: c.minute,
-      time: eventTime(c, v.match.started_at),
       at: c.created_at,
       home: c.team_id === v.home,
       text: `${CARD_LABEL[c.type]} ${d.playerName.get(c.player_id)}`,
@@ -48,7 +45,7 @@ export default async function MatchPage({ params }: PageProps<'/match/[id]'>) {
           <ol className="space-y-2 text-sm">
             {timeline.map((e) => (
               <li key={e.key} className={`flex gap-3 ${e.home ? '' : 'flex-row-reverse text-right'}`}>
-                <span className="w-16 shrink-0 text-center text-slate-400 tabular-nums">{e.time}</span>
+                <span className="w-8 shrink-0 text-center text-slate-400 tabular-nums">{e.minute !== null ? `${e.minute}'` : ''}</span>
                 <span>{e.text}</span>
               </li>
             ))}
