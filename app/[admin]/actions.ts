@@ -175,6 +175,5 @@ export async function resetAll(key: string, confirm: string) {
       .update({ status: 'scheduled', started_at: null, home_pk: null, away_pk: null, manual_home_team_id: null, manual_away_team_id: null })
       .gt('id', 0),
   );
-  await run(db.from('slots').update({ team_id: null }).gt('id', 0));
   refresh();
 }

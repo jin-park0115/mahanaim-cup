@@ -1,5 +1,5 @@
 'use client';
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { addCard, addGoal, addPlayer, deleteEvent, finishMatch, setEventMinute, startMatch } from '../../actions.ts';
 
 type Player = { id: number; name: string; suspended: boolean };
@@ -8,7 +8,7 @@ export type Event = { kind: 'goal' | 'card'; id: number; minute: number | null; 
 type Props = {
   adminKey: string;
   title: string;
-  match: { id: number; status: 'scheduled' | 'live' | 'finished'; knockout: boolean; home_pk: number | null; away_pk: number | null };
+  match: { id: number; status: 'scheduled' | 'live' | 'finished'; started_at: string | null; knockout: boolean; home_pk: number | null; away_pk: number | null };
   home: Side;
   away: Side;
   score: number[];
@@ -46,6 +46,7 @@ export function CourtPanel({ adminKey: key, title, match, home, away, score, eve
   return (
     <div className={pending ? 'pointer-events-none opacity-60' : ''}>
       <p className="text-sm text-slate-500">{title}</p>
+      {match.status === 'live' && match.started_at && <Timer since={match.started_at} />}
       <div className="my-3 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 rounded-xl bg-white p-4 shadow-sm">
         <span className="truncate text-right text-lg font-bold">{home.label}</span>
         <span className="text-4xl font-black tabular-nums">
@@ -192,6 +193,25 @@ export function CourtPanel({ adminKey: key, title, match, home, away, score, eve
         </>
       )}
     </div>
+  );
+}
+
+// 경기 시작(started_at)부터 흐른 시간. 폰 시계 기준이라 몇 초 차이는 날 수 있음
+function Timer({ since }: { since: string }) {
+  const [now, setNow] = useState<number | null>(null);
+  useEffect(() => {
+    const tick = () => setNow(Date.now());
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, []);
+  const s = now === null ? 0 : Math.max(0, Math.floor((now - new Date(since).getTime()) / 1000));
+  const mmss = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+  return (
+    <p className="mt-2 rounded-xl bg-slate-900 py-3 text-center text-4xl font-black tabular-nums text-white">
+      <span className="mr-2 animate-pulse text-base text-red-500">●</span>
+      {mmss}
+    </p>
   );
 }
 

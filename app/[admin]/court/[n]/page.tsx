@@ -81,7 +81,7 @@ export default async function CourtPage({ params, searchParams }: PageProps<'/[a
         key={v.match.id}
         adminKey={admin}
         title={`${courtName(court)} · ${v.match.start_time.slice(0, 5)} · ${DIVISION_LABEL[d.division]} ${v.match.stage === 'group' ? d.groupLabel(v.match.group) : stageLabel(v.match)}`}
-        match={{ id: v.match.id, status: v.match.status, knockout: v.match.stage !== 'group', home_pk: v.match.home_pk, away_pk: v.match.away_pk }}
+        match={{ id: v.match.id, status: v.match.status, started_at: v.match.started_at, knockout: v.match.stage !== 'group', home_pk: v.match.home_pk, away_pk: v.match.away_pk }}
         home={{ team: v.home, label: v.homeLabel, players: roster(v.home) }}
         away={{ team: v.away, label: v.awayLabel, players: roster(v.away) }}
         score={v.score ?? [0, 0]}
