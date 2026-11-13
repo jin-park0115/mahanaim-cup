@@ -206,6 +206,9 @@ export function CourtPanel({ adminKey: key, title, match, home, away, score, eve
   );
 }
 
+// 경기 15분 + 휴식 5분 = 시간표 20분 간격
+const MATCH_SECONDS = 15 * 60;
+
 // 경기 시작(started_at)부터 흐른 시간. 폰 시계 기준이라 몇 초 차이는 날 수 있음
 function Timer({ since }: { since: string }) {
   const [now, setNow] = useState<number | null>(null);
@@ -217,11 +220,19 @@ function Timer({ since }: { since: string }) {
   }, []);
   const s = now === null ? 0 : Math.max(0, Math.floor((now - new Date(since).getTime()) / 1000));
   const mmss = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+  const over = s >= MATCH_SECONDS;
+  // 15분이 되는 순간 한 번 진동(안드로이드만. 아이폰은 진동 API 없음)
+  useEffect(() => {
+    if (over) navigator.vibrate?.([300, 150, 300]);
+  }, [over]);
   return (
-    <p className="mt-2 rounded-xl bg-slate-900 py-3 text-center text-4xl font-black tabular-nums text-white">
-      <span className="mr-2 animate-pulse text-base text-red-500">●</span>
-      {mmss}
-    </p>
+    <div className={`mt-2 rounded-xl py-3 text-center text-white ${over ? 'animate-pulse bg-red-600' : 'bg-slate-900'}`}>
+      <p className="text-4xl font-black tabular-nums">
+        <span className={`mr-2 text-base ${over ? 'text-white' : 'animate-pulse text-red-500'}`}>●</span>
+        {mmss}
+      </p>
+      {over && <p className="mt-1 text-sm font-bold">⏰ 15분 경과 · 경기 종료 시간</p>}
+    </div>
   );
 }
 
